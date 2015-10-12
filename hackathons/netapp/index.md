@@ -50,9 +50,6 @@ Answer: * Date
 * Firmware Version
 * Software Version
 
-
-
-
 # Approach
 
 Based on the information you've obtained during the Q/A session, come up with
