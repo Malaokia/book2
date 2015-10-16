@@ -15,23 +15,17 @@ Three example of specific questions in this class are:
 Come up with five additional question classes. Each must have two or three
 variables.
 
-## (Question template)
+## (Which region has the highest amount of business open after 9pm)
 Three example of specific questions in this class are:
-* (specific question)
-* (specific question)
-* (specific question)
+* (Is north has higher amount of business than the south? or vice versa)
+* (Is east has the higher amount of business than the west? or vice versa)
+* (What is the relative amount of business of colorado compare to the east?)
 
-## (Question template)
+## (How many businesses recieved an average review of X stars or above?)
 Three example of specific questions in this class are:
-* (specific question)
-* (specific question)
-* (specific question)
-
-## (Question template)
-Three example of specific questions in this class are:
-* (specific question)
-* (specific question)
-* (specific question)
+* (How many businesses recieved an average review of 2 stars or above?)
+* (How many businesses recieved an average review of 3 stars or above?)
+* (How many businesses recieved an average review of 4 stars or above?)
 
 ## (Question template)
 Three example of specific questions in this class are:
