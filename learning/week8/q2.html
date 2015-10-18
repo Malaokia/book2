@@ -68,7 +68,7 @@
     <body>
         <!-- body:start -->
         
-    <div class="book" data-level="1.2.3" data-basepath="../.." data-revision="Fri Oct 16 2015 13:18:39 GMT-0600 (Mountain Daylight Time)">
+    <div class="book" data-level="1.2.3" data-basepath="../.." data-revision="Sun Oct 18 2015 13:20:42 GMT-0600 (Mountain Daylight Time)">
     
 
 <div class="book-summary">
@@ -460,9 +460,152 @@
                     <section class="normal" id="section-">
                     
                         <h1 id="individual-2-of-3">Individual 2 of 3</h1>
-<h2 id="-question-class">(Question class)</h2>
-<p>(fill in the rest to provide an interactive visualization interface for
-    this question class)</p>
+<h2 id="-how-many-businesses-in-state-x-have-more-than-y-review-counts-in-z-order">(How many businesses in state X have more than Y review counts in Z order?)</h2>
+<div style="border:1px grey solid; padding:5px;">
+    <div><h5>X</h5> (State)
+        <input id="state" type="text" value="AZ">
+    </div>
+    <div><h5>Y</h5> (Review Count)
+        <input id="count" type="text" value="100">
+    </div>
+    <div><h5>Z</h5> (ascending/descending)
+        <input id="dir" type="text" value="ascending">
+    </div>
+    <div style="margin:20px;">
+        <button id="viz">Visualize</button>
+    </div>
+</div>
+
+<p><div class="myviz" style="width:100%; height:500px; border: 1px black solid; padding: 5px;">
+Data is not loaded yet
+</div>
+<pre><code>items = &apos;not loaded yet&apos;
+$.get(&apos;http://bigdatahci2015.github.io/data/yelp/yelp_academic_dataset_business.5000.json.lines.txt&apos;)
+    .success(function(data){
+        var lines = data.trim().split(&apos;\n&apos;)
+        // convert text lines to json arrays and save them in `items`
+        items = _.map(lines, JSON.parse)
+        console.log(&apos;number of items loaded:&apos;, items.length)
+        console.log(&apos;first item&apos;, items[0])
+     })
+     .error(function(e){
+         console.error(e)
+     })
+
+function viz(state, count, direction){
+
+    // define a template string
+    var tplString = &apos;&lt;g transform=&quot;translate(0 ${d.y})&quot;&gt; \
+                    &lt;text y=&quot;20&quot;&gt;${d.label}&lt;/text&gt; \
+                    &lt;rect x=&quot;50&quot;   \
+                         width=&quot;${d.width}&quot; \
+                         height=&quot;${d.height}&quot;  \
+                         style=&quot;fill:${d.color};    \
+                                stroke-width:3; \
+                                stroke:rgb(0,0,0)&quot; /&gt;   \
+                    &lt;text transform=&quot;translate(50 15)&quot;&gt;${d.nlabel}&lt;/text&gt;  \
+                    &lt;/g&gt;&apos;
+
+    // compile the string to get a template function
+    var template = _.template(tplString)
+
+    function computeX(d, i) {
+        return 0
+    }
+
+    function computeWidth(d, i) {
+        if(d[1].length &lt; 700){return d[1].length;}
+        else{return 700;}
+    }
+    // Scale the height by the maximum number of businesses in the result
+    function computeHeight(d, i) {
+        return Math.round(d[1].length &lt;= 700 ? 20 : 20 * (d[1].length/700))
+    }
+
+    // Adjust y coordinate by width of previous bars
+    function computeY(d, i) {
+        return y = i==0? 0: _.reduce(_.map(S.slice(0,i), function(d) {
+                                        return computeHeight(d, 0)}),
+                                    function(total, d) {
+                                        return total + d
+                                    })
+    }
+
+
+    function computeColor(d, i) {
+        return &apos;green&apos;
+    }
+
+    function computeLabel(d, i) {
+        return d[0]     // The label is the state abbreviation
+    }
+    function computeNLabel(d,i){
+      return d[1].length
+    }
+
+    // Convert hour string to int
+    /*
+    function H2I(h) {
+        var x = h.split(&apos;:&apos;)
+        return x[0] * 3600 + x[1] * 60
+    }
+
+    // The input hour as an integer
+    var HAI = H2I(hour)
+    console.log(&apos;hour&apos;, hour)
+*/
+    // First filter all entries for the specified day and time
+    itemsFiltered = _.filter(items, function(d) {
+        return (d.state == state) &amp;&amp; (d.review_count &gt;= count)
+    })
+
+    // Next group by state
+    var groups = _.groupBy(itemsFiltered, &apos;review_count&apos;)
+    console.log(&apos;groups&apos;, groups)
+
+    // Convert to array of [state, record]
+    var pairs = _.pairs(groups)
+    console.log(&apos;pairs&apos;, pairs)
+
+    // Sort in specified direction
+    var sortorder = direction == &apos;ascending&apos;? 1 : -1
+    pairsSorted = _.sortBy(pairs, function(d, i) {
+        return d[1].length * sortorder
+        })
+
+    console.log(&apos;pairs sorted&apos;, pairsSorted)
+
+    // Just take the first 20 states
+    S = _.take(pairsSorted, 20)
+
+    var viz = _.map(S, function(d, i){
+                return {
+                    x: computeX(d, i),
+                    y: computeY(d, i),
+                    width: computeWidth(d, i),
+                    height: computeHeight(d, i),
+                    color: computeColor(d, i),
+                    label: computeLabel(d, i),
+                    nlabel: computeNLabel(d,i)
+                }
+             })
+    console.log(&apos;viz&apos;, viz)
+
+    var result = _.map(viz, function(d){
+             // invoke the compiled template function on each viz data
+             return template({d: d})
+         })
+    console.log(&apos;result&apos;, result)
+
+    $(&apos;.myviz&apos;).html(&apos;&lt;svg width=&quot;100%&quot; height=&quot;100%&quot;&gt;&apos; + result + &apos;&lt;/svg&gt;&apos;)
+}
+
+$(&apos;button#viz&apos;).click(function(){
+    var arg1 = $(&apos;input#state&apos;).val()
+    var arg2 = $(&apos;input#count&apos;).val()
+    var arg3 = $(&apos;input#dir&apos;).val()
+    viz(arg1,arg2,arg3)
+})</code></pre><script>var code ="items = 'not loaded yet'\r\n$.get('http://bigdatahci2015.github.io/data/yelp/yelp_academic_dataset_business.5000.json.lines.txt')\r\n    .success(function(data){\r\n        var lines = data.trim().split('\\n')\r\n        // convert text lines to json arrays and save them in `items`\r\n        items = _.map(lines, JSON.parse)\r\n        console.log('number of items loaded:', items.length)\r\n        console.log('first item', items[0])\r\n     })\r\n     .error(function(e){\r\n         console.error(e)\r\n     })\r\n\r\nfunction viz(state, count, direction){\r\n\r\n    // define a template string\r\n    var tplString = '<g transform=\"translate(0 ${d.y})\"> \\\r\n                    <text y=\"20\">${d.label}</text> \\\r\n                    <rect x=\"50\"   \\\r\n                         width=\"${d.width}\" \\\r\n                         height=\"${d.height}\"  \\\r\n                         style=\"fill:${d.color};    \\\r\n                                stroke-width:3; \\\r\n                                stroke:rgb(0,0,0)\" />   \\\r\n                    <text transform=\"translate(50 15)\">${d.nlabel}</text>  \\\r\n                    </g>'\r\n\r\n    // compile the string to get a template function\r\n    var template = _.template(tplString)\r\n\r\n    function computeX(d, i) {\r\n        return 0\r\n    }\r\n\r\n    function computeWidth(d, i) {\r\n        if(d[1].length < 700){return d[1].length;}\r\n        else{return 700;}\r\n    }\r\n    // Scale the height by the maximum number of businesses in the result\r\n    function computeHeight(d, i) {\r\n        return Math.round(d[1].length <= 700 ? 20 : 20 * (d[1].length/700))\r\n    }\r\n\r\n    // Adjust y coordinate by width of previous bars\r\n    function computeY(d, i) {\r\n        return y = i==0? 0: _.reduce(_.map(S.slice(0,i), function(d) {\r\n                                        return computeHeight(d, 0)}),\r\n                                    function(total, d) {\r\n                                        return total + d\r\n                                    })\r\n    }\r\n\r\n\r\n    function computeColor(d, i) {\r\n        return 'green'\r\n    }\r\n\r\n    function computeLabel(d, i) {\r\n        return d[0]     // The label is the state abbreviation\r\n    }\r\n    function computeNLabel(d,i){\r\n      return d[1].length\r\n    }\r\n\r\n    // Convert hour string to int\r\n    /*\r\n    function H2I(h) {\r\n        var x = h.split(':')\r\n        return x[0] * 3600 + x[1] * 60\r\n    }\r\n\r\n    // The input hour as an integer\r\n    var HAI = H2I(hour)\r\n    console.log('hour', hour)\r\n*/\r\n    // First filter all entries for the specified day and time\r\n    itemsFiltered = _.filter(items, function(d) {\r\n        return (d.state == state) && (d.review_count >= count)\r\n    })\r\n\r\n    // Next group by state\r\n    var groups = _.groupBy(itemsFiltered, 'review_count')\r\n    console.log('groups', groups)\r\n\r\n    // Convert to array of [state, record]\r\n    var pairs = _.pairs(groups)\r\n    console.log('pairs', pairs)\r\n\r\n    // Sort in specified direction\r\n    var sortorder = direction == 'ascending'? 1 : -1\r\n    pairsSorted = _.sortBy(pairs, function(d, i) {\r\n        return d[1].length * sortorder\r\n        })\r\n\r\n    console.log('pairs sorted', pairsSorted)\r\n\r\n    // Just take the first 20 states\r\n    S = _.take(pairsSorted, 20)\r\n\r\n    var viz = _.map(S, function(d, i){\r\n                return {\r\n                    x: computeX(d, i),\r\n                    y: computeY(d, i),\r\n                    width: computeWidth(d, i),\r\n                    height: computeHeight(d, i),\r\n                    color: computeColor(d, i),\r\n                    label: computeLabel(d, i),\r\n                    nlabel: computeNLabel(d,i)\r\n                }\r\n             })\r\n    console.log('viz', viz)\r\n\r\n    var result = _.map(viz, function(d){\r\n             // invoke the compiled template function on each viz data\r\n             return template({d: d})\r\n         })\r\n    console.log('result', result)\r\n\r\n    $('.myviz').html('<svg width=\"100%\" height=\"100%\">' + result + '</svg>')\r\n}\r\n\r\n$('button#viz').click(function(){\r\n    var arg1 = $('input#state').val()\r\n    var arg2 = $('input#count').val()\r\n    var arg3 = $('input#dir').val()\r\n    viz(arg1,arg2,arg3)\r\n})"</script></p>
 
                     
                     </section>
@@ -520,9 +663,13 @@
     <script src="../../gitbook/plugins/gitbook-plugin-fontsettings/buttons.js"></script>
     
 
+    
+    <script src="../../gitbook/plugins/gitbook-plugin-livereload/plugin.js"></script>
+    
+
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"bigdata":{},"toggle-chapters":{},"highlight":{},"search":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
+    var config = {"bigdata":{},"toggle-chapters":{},"highlight":{},"search":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"livereload":{}};
     gitbook.start(config);
 });
 </script>
