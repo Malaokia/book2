@@ -12,9 +12,6 @@ Three example of specific questions in this class are:
 * How many businesses have more than 500 review counts?
 * How many businesses have more than 100 review counts?
 
-Come up with five additional question classes. Each must have two or three
-variables.
-
 ## (Which region has the highest amount of business open after 9pm)
 Three example of specific questions in this class are:
 * (Is north has higher amount of business than the south? or vice versa)
@@ -27,14 +24,8 @@ Three example of specific questions in this class are:
 * (How many businesses recieved an average review of 3 stars or above?)
 * (How many businesses recieved an average review of 4 stars or above?)
 
-## (Question template)
+## How many businesses are open on X day and Y hour?
 Three example of specific questions in this class are:
-* (specific question)
-* (specific question)
-* (specific question)
-
-## (Question template)
-Three example of specific questions in this class are:
-* (specific question)
-* (specific question)
-* (specific question)
+* (How many businesses are open on Monday at 1 am?)
+* (How many businesses are open on Sunday at 12 noon?)
+* (How many businesses are open on Saturday at 4am?)

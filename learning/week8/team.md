@@ -3,7 +3,7 @@
 Pick one question class and build an exploratory visualization interface for it.
 The question class you pick must have at least three variables that can be changed.
 
-## (Question class)
+## (How many businesses are open on X day at Y hour?)
 <div style="border:1px grey solid; padding:5px;">
     <div><h5>X</h5> (Monday/Tuesday/Wednesday/Thursday/Friday/Saturday/Sunday)
         <input id="day" type="text" value="Monday"/>
@@ -13,7 +13,7 @@ The question class you pick must have at least three variables that can be chang
     </div>
     <div><h5>Z</h5> (ascending or descending)
         <input id="dir" type="text" value="ascending"/>
-    </div>    
+    </div>
     <div style="margin:20px;">
         <button id="viz">Visualize</button>
     </div>
@@ -27,7 +27,7 @@ Data is not loaded yet
 items = 'not loaded yet'
 
 $.get('http://bigdatahci2015.github.io/data/yelp/yelp_academic_dataset_business.5000.json.lines.txt')
-    .success(function(data){        
+    .success(function(data){
         var lines = data.trim().split('\n')
 
         // convert text lines to json arrays and save them in `items`
@@ -41,7 +41,7 @@ $.get('http://bigdatahci2015.github.io/data/yelp/yelp_academic_dataset_business.
          console.error(e)
      })
 
-function viz(day, hour, direction){    
+function viz(day, hour, direction){
 
     // define a template string
     var tplString = '<g transform="translate(0 ${d.y})"> \
@@ -61,9 +61,9 @@ function viz(day, hour, direction){
         return 0
     }
 
-    function computeWidth(d, i) {        
+    function computeWidth(d, i) {
         if(d[1].length < 700){return d[1].length;}
-        else{return 700;} 
+        else{return 700;}
     }
 
     // Scale the height by the maximum number of businesses in the result
@@ -74,12 +74,12 @@ function viz(day, hour, direction){
     // Adjust y coordinate by width of previous bars
     function computeY(d, i) {
         return y = i==0? 0: _.reduce(_.map(S.slice(0,i), function(d) {
-                                        return computeHeight(d, 0)}), 
+                                        return computeHeight(d, 0)}),
                                     function(total, d) {
                                         return total + d
                                     })
     }
-                                
+
 
     function computeColor(d, i) {
         return 'red'
@@ -125,7 +125,7 @@ function viz(day, hour, direction){
     // Just take the first 20 states
     S = _.take(pairsSorted, 20)
 
-    var viz = _.map(S, function(d, i){                
+    var viz = _.map(S, function(d, i){
                 return {
                     x: computeX(d, i),
                     y: computeY(d, i),
@@ -146,12 +146,12 @@ function viz(day, hour, direction){
     $('.myviz').html('<svg width="100%" height="100%">' + result + '</svg>')
 }
 
-$('button#viz').click(function(){    
+$('button#viz').click(function(){
     var arg1 = $('input#day').val()
     var arg2 = $('input#hour').val()
-    var arg3 = $('input#dir').val()  
+    var arg3 = $('input#dir').val()
     viz(arg1,arg2,arg3)
-})  
+})
 
 {% endscript %}
 
