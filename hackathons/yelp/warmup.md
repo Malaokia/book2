@@ -69,7 +69,7 @@ function viz(arg1, arg2, arg3){
     }
 
     // TODO: group items based on the attribute specified by users
-    
+
     var groups = _.groupBy(items, function(x){
         return x[arg1]
     })
@@ -77,10 +77,10 @@ function viz(arg1, arg2, arg3){
     var pairs = _.pairs(groups)
     // TODO: group items based on the attribute specified by users
     var sortorder = arg2 == 'ascending'? 1 : -1
-    var pairsSorted = _.sortBy(pairs, function(d, i) {
+    var pairsSorted = _.sortBy(pairs, ffunction(d, i) {
        return d[1].length * sortorder
     })
-    
+
     // TODO: sort pairs in the order specified by users
 
     var viz = _.map(pairsSorted, function(d, i){                
